@@ -1,6 +1,10 @@
+import 'dart:convert';
+
 import 'package:blinketclone/constants/appcolors.dart';
 import 'package:blinketclone/repository/widgets/uihelper.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class BlinkitLoginscreen extends StatefulWidget {
   const BlinkitLoginscreen({Key? key}) : super(key: key);
@@ -13,29 +17,42 @@ class _BlinkitLoginPageState extends State<BlinkitLoginscreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
-  bool isLoading = false;
+  final storage = FlutterSecureStorage();
 
-  void loginUser() async {
-    setState(() {
-      isLoading = true;
-      debugPrint("Email: ${emailController.text}");
-      debugPrint("Password: ${passwordController.text}");
-    });
+  Future<void> loginUser(String email, String password) async {
+    debugPrint("Email: ${email}");
+    debugPrint("Password: ${password}");
 
-    await Future.delayed(const Duration(seconds: 2)); 
+    final url = Uri.parse('http://localhost:8080/api/auth/login');
 
-    setState(() {
-      isLoading = false;
-    });
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: '{"email": "$email", "password": "$password"}',
+      );
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Login Successful")),
-    );
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final token = data['auth_token'];
+
+        await storage.write(key: 'jwt', value: token);
+
+        print('Login Successful, JWT: $token');
+      } else {
+        final error = jsonDecode(response.body);
+        print('Login Failed: ${error['message'] ?? response.body}');
+      }
+    } catch (e) {
+      print('Error during login: $e');
+    }
+    // ScaffoldMessenger.of(
+    //   context,
+    // ).showSnackBar(const SnackBar(content: Text("Login Successful")));
   }
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       backgroundColor: AppColors.scaffoldBackgroundColor,
       body: SafeArea(
@@ -119,17 +136,18 @@ class _BlinkitLoginPageState extends State<BlinkitLoginscreen> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        onPressed: isLoading ? null : loginUser,
-                        child: isLoading
-                            ? const CircularProgressIndicator(
-                                color: Colors.white,
-                              )
-                            : UiHelper.CustomText(
-                                text: "Login",
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontsize: 16,
-                              ),
+                        onPressed: () async {
+                          await loginUser(
+                            emailController.text.trim(),
+                            passwordController.text.trim(),
+                          );
+                        },
+                        child: UiHelper.CustomText(
+                          text: "Login",
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontsize: 16,
+                        ),
                       ),
                     ),
 
