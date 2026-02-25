@@ -2,17 +2,17 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import bcrypt from "bcrypt";
 import { Model } from 'mongoose';
-import { SignupDto } from 'src/auth/DTO/signup.dto';
+import { UserDto } from 'src/auth/DTO/user.dto';
 import { UserSchemaModel } from './schema/user.schema';
 import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UserService {
     constructor(@InjectModel(UserSchemaModel.name) private userModel: Model<UserSchemaModel>,public jwtService: JwtService) { }
-    async createUser(SignupDto: SignupDto) {
+    async createUser(UserDto: UserDto) {
         try {
             const existingUser = await this.userModel.findOne({
-                email: SignupDto.email,
+                email: UserDto.email,
             });
 
             if (existingUser) {
@@ -26,10 +26,10 @@ export class UserService {
                 }
             }
 
-            const hashedPassword = await bcrypt.hash(SignupDto.password, 10);
+            const hashedPassword = await bcrypt.hash(UserDto.password, 10);
 
             const user = await this.userModel.create({
-                email: SignupDto.email,
+                email: UserDto.email,
                 password: hashedPassword,
             });
             return {
@@ -45,7 +45,7 @@ export class UserService {
         }
     }
     
-    async signin(SignupDto: SignupDto){
+    async signin(UserDto: UserDto){
         // create a signin feat here
     }
 }
