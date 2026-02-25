@@ -7,21 +7,49 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
 import { jwtConstants } from './auth/constants';
 import { JwtModule } from '@nestjs/jwt';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
-  imports: [
-      AuthModule, 
-      UserModule,
-      ConfigModule.forRoot(),
-      MongooseModule.forRoot(`${process.env.NODE_ENV == "development" ? "mongodb://localhost:27017/blinkit" : process.env.DATABASE_URL}`),
-      JwtModule.register({
-          global: true,
-          secret: jwtConstants.secret,
-          signOptions: { expiresIn: process.env.NODE_ENV == "development" ? '10d' : Number(process.env.JWT_EXPIRES_IN)},
-      })],
-      
-      
-  controllers: [AppController],
-  providers: [AppService],
+    imports: [
+        AuthModule,
+        UserModule,
+        ConfigModule.forRoot(),
+        MongooseModule.forRoot(`${process.env.NODE_ENV == "development" ? "mongodb://localhost:27017/blinkit" : process.env.DATABASE_URL}`),
+        JwtModule.register({
+            global: true,
+            secret: jwtConstants.secret,
+            signOptions: { expiresIn: process.env.NODE_ENV == "development" ? '10d' : Number(process.env.JWT_EXPIRES_IN) },
+        }),
+        ThrottlerModule.forRoot([
+            {
+                name: 'short',
+                ttl: 1000, 
+                limit: 3, 
+            },
+            {
+                name: 'medium',
+                ttl: 10000,
+                limit: 20
+            },
+            {
+                name: 'long',
+                ttl: 60000,
+                limit: 100
+            }
+        ]),
+    ],
+
+    controllers: [AppController],
+
+
+    
+    providers: [
+        AppService,
+        {
+            provide: APP_GUARD,
+            useClass: ThrottlerGuard,
+        },
+    ],
 })
-export class AppModule {}
+export class AppModule { }
