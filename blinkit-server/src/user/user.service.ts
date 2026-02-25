@@ -8,7 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UserService {
-    constructor(@InjectModel(UserSchemaModel.name) private userModel: Model<UserSchemaModel>,public jwtService: JwtService) { }
+    constructor(@InjectModel(UserSchemaModel.name) private userModel: Model<UserSchemaModel>, public jwtService: JwtService) { }
     async createUser(UserDto: UserDto) {
         try {
             const existingUser = await this.userModel.findOne({
@@ -37,16 +37,51 @@ export class UserService {
                 email: user.email,
                 statusCode: 201
             };
-            
+
         } catch (error) {
             throw new InternalServerErrorException(
                 'Something went wrong while creating user',
             );
         }
     }
-    
-    async signin(UserDto: UserDto){
+
+    async signin(UserDto: UserDto) {
         // create a signin feat here
+        try {
+            const existingUser = await this.userModel.findOne({
+                email: UserDto.email,
+            });
+
+            if (existingUser) {
+                const isMatchPassword = await bcrypt.compare(UserDto.password, existingUser.password);
+                if (!isMatchPassword) {
+                    return {
+                        message: "Invalid Credential...",
+                        stausCode: 401
+                    }
+
+                } else {
+                    const payload = { sub: existingUser.id, email: existingUser.email };
+                    const Token = await this.jwtService.signAsync(payload);
+                    return {
+                        id: existingUser._id,
+                        email: existingUser.email,
+                        statusCode: 200,
+                        Token
+                    }
+                }
+
+            }
+            return {
+                message: "user not found...",
+                statusCode: 404
+            }
+
+        } catch (error) {
+            throw new InternalServerErrorException(
+                'Something went wrong while creating user',
+            );
+        }
     }
 }
 
