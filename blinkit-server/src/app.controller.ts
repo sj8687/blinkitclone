@@ -8,5 +8,6 @@ export class AppController {
   @Get()
   getStatus(): string {
     return this.appService.getSystemStatus();
+    
   }
 }

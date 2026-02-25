@@ -10,4 +10,7 @@ export class AuthController {
       signUp(@Body() SignupDto: SignupDto) {
         return this.authService.signupUser(SignupDto);
       }
+      signIn(@Body() SignupDto: SignupDto) {
+        return this.authService.signinUser(SignupDto);
+      }
 }

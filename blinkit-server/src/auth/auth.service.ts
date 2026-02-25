@@ -8,4 +8,7 @@ export class AuthService {
     signupUser(SignupDto:SignupDto) {
         return this.UserService.createUser(SignupDto);
     };
+    signinUser(SignupDto:SignupDto) {
+        return this.UserService.signin(SignupDto);
+    };
 }

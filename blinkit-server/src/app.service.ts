@@ -4,5 +4,6 @@ import { Injectable } from '@nestjs/common';
 export class AppService {
   getSystemStatus(): string {
     return 'System is Healthy';
+    
   }
 }
