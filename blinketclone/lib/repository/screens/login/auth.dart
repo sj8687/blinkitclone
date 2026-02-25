@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'package:blinketclone/constants/appcolors.dart';
+import 'package:blinketclone/model/model.dart';
+import 'package:blinketclone/repository/screens/bottomnav/bottomnavscreen.dart';
 import 'package:blinketclone/repository/screens/home/homescreen.dart';
 import 'package:blinketclone/repository/widgets/uihelper.dart';
 import 'package:flutter/material.dart';
@@ -24,10 +26,10 @@ class _BlinkitLoginPageState extends State<BlinkitLoginscreen> {
     debugPrint("Email:$email");
     debugPrint("Password:$password");
 
-    //Navigator.push(
-    //context,
-    //MaterialPageRoute(builder:(context)=>BottomNavscreen()),
-    //);
+    Navigator.push(
+    context,
+    MaterialPageRoute(builder:(context)=>BottomNavscreen()),
+    );
 
     final url = Uri.parse('http://localhost:3000/auth/signup');
 
@@ -38,22 +40,27 @@ class _BlinkitLoginPageState extends State<BlinkitLoginscreen> {
         body: jsonEncode({"email": email, "password": password}),
       );
 
-      if (response.statusCode == 200) {
+      if (response.statusCode >= 200 && response.statusCode < 300) {
         final data = jsonDecode(response.body);
 
-        // await storage.write(key:'jwt',value:data['token'],);
+        final login = LoginModel.fromJson(data);
+
+        await storage.write(key: 'jwt', value: login.token);
 
         print("Login Successful:$data");
 
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => Homescreen()),
-        );
+        String? token = await storage.read(key: 'jwt');
+
+        print(token);
 
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text("Login Successful")));
-        
+
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => BottomNavscreen()),
+        );
       } else {
         final error = jsonDecode(response.body);
         print("Login Failed:${error['message']}");
@@ -82,7 +89,7 @@ class _BlinkitLoginPageState extends State<BlinkitLoginscreen> {
                     height: 120.h,
                   ),
 
-                  SizedBox(height: 10.h),
+                  SizedBox(height: 5.h),
 
                   UiHelper.CustomText(
                     text: "India’s last minute app",
@@ -93,7 +100,6 @@ class _BlinkitLoginPageState extends State<BlinkitLoginscreen> {
                 ],
               ),
 
-              ///Login Card
               Container(
                 width: double.infinity,
                 padding: EdgeInsets.all(20.w),
@@ -118,7 +124,8 @@ class _BlinkitLoginPageState extends State<BlinkitLoginscreen> {
                     ),
 
                     SizedBox(height: 20.h),
-                    SizedBox(height: 50.h,
+                    SizedBox(
+                      height: 50.h,
 
                       child: TextField(
                         controller: emailController,

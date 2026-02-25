@@ -13,8 +13,8 @@ class BottomNavscreen extends StatefulWidget {
 class _BottomNavscreenState extends State<BottomNavscreen> {
   int currentindex = 0;
   List<Widget> pages = [
-    Homescreen(),
-    Categoryscreen(),
+    BlinkitHomescreen(),
+    BlinkitCategoryscreen(),
     Cartscreen(),
     Printscreen(),
   ];
@@ -30,22 +30,21 @@ class _BottomNavscreenState extends State<BottomNavscreen> {
             label: "Home",
           ),
           BottomNavigationBarItem(
-            icon: UiHelper.CustomImage(img: "category.png"),
+            icon: UiHelper.CustomImage(img: "bag.png", width: 24, height: 24),
             label: "Category",
           ),
           BottomNavigationBarItem(
-            icon: SizedBox(
-              width: 24,
-              height: 24,
-              child: UiHelper.CustomImage(img: "bag.png"),
-            ),
+            icon: SizedBox(child: UiHelper.CustomImage(img: "category.png")),
             label: "Cart",
           ),
           BottomNavigationBarItem(
             icon: UiHelper.CustomImage(img: "printer.png"),
             label: "Print",
           ),
-        ],type: BottomNavigationBarType.fixed,currentIndex: currentindex,onTap: (index){
+        ],
+        type: BottomNavigationBarType.fixed,
+        currentIndex: currentindex,
+        onTap: (index) {
           setState(() {
             currentindex = index;
           });
