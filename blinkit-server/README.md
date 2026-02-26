@@ -19,7 +19,7 @@
 
 ## END POINTS 
 
-  POST /auth/signup
+*  POST /auth/signup
 
   --- PAYLOAD 
 
@@ -37,6 +37,34 @@
        }     
 
        if user alredy exist then 
+
+  --- RESPONSE     
+
+       {
+          "id": "699ed0f0bf477cae866140b2",
+          "email": "test5@gmail.com",
+          "statusCode": 200,
+          "Token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2OTllZDBmMGJmNDc3Y2FlODY2MTQwYjIiLCJlbWFpbCI6InRlc3Q1QGdtYWlsLmNvbSIsImlhdCI6MTc3MjAxNjA0MCwiZXhwIjoxNzcyMDE2MTAwfQ.KjQj7u5PUDad5ggtWfebyMA-KHCnc0ig0VUY5kvpxH4"
+       }
+
+*  POST /auth/signin
+
+  --- PAYLOAD 
+
+       {
+          "email": "test3@gmail.com",
+          "password": "StrongPassword@123"
+       }
+
+  --- RESPONSE
+
+       {
+          "id": "699ed0f0bf477cae866140b2",
+          "email": "test5@gmail.com",
+          "statusCode": 201
+       }     
+
+       if user exist then 
 
   --- RESPONSE     
 
