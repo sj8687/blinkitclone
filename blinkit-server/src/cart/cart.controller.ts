@@ -1,11 +1,10 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
-import { CartService } from './cart.service';
-import { JwtService } from '@nestjs/jwt';
-import { Model } from 'mongoose';
-import { CartSchemaModel } from './schema/add.cart.schema';
+import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { AddCartDto } from './DTO/add.cart.dto';
+import { Model } from 'mongoose';
 import { AuthGuard } from 'src/auth/Guards/auth.guard';
+import { CartService } from './cart.service';
+import { AddCartDto } from './DTO/add.cart.dto';
+import { CartSchemaModel } from './schema/add.cart.schema';
 
 @Controller('cart')
 export class CartController {    
@@ -13,7 +12,7 @@ export class CartController {
 
     @Post('add')
     @UseGuards(AuthGuard)
-    addCart(@Body() AddCartDto: AddCartDto){
-        return this.CartService.addCart(AddCartDto);
+    addCart(@Body() AddCartDto: AddCartDto,@Req() req:any){
+        return this.CartService.addCart(AddCartDto,req.user.userId);
     }
 }

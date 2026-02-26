@@ -16,7 +16,7 @@ export class UserService {
             });
 
             if (existingUser) {
-                const payload = { sub: existingUser.id, email: existingUser.email };
+                const payload = { userId: existingUser._id, email: existingUser.email };
                 const Token = await this.jwtService.signAsync(payload);
                 return {
                     id: existingUser._id,
@@ -61,7 +61,7 @@ export class UserService {
                     }
 
                 } else {
-                    const payload = { sub: existingUser.id, email: existingUser.email };
+                    const payload = { userId: existingUser._id, email: existingUser.email };
                     const Token = await this.jwtService.signAsync(payload);
                     return {
                         id: existingUser._id,

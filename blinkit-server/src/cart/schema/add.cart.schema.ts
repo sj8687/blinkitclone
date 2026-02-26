@@ -1,10 +1,17 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { HydratedDocument } from "mongoose";
+import { UserSchemaModel } from "src/user/schema/user.schema";
 
 export type UserDocument = HydratedDocument<CartSchemaModel>;
 
 @Schema()
 export class CartSchemaModel {
+    @Prop({
+        type: mongoose.Schema.Types.ObjectId,
+        ref: UserSchemaModel.name,   
+        required: true
+    })
+    user: mongoose.Types.ObjectId;
     @Prop({
         required: true,
         unique: true,
@@ -24,7 +31,7 @@ export class CartSchemaModel {
     })
     price: mongoose.Types.Decimal128;
 
-     @Prop({
+    @Prop({
         required: true
     })
     qty: number;
