@@ -9,13 +9,14 @@ export class CartSchemaModel {
     @Prop({
         type: mongoose.Schema.Types.ObjectId,
         ref: UserSchemaModel.name,   
-        required: true
+        required: true,
+        index:true
     })
     user: mongoose.Types.ObjectId;
     @Prop({
         required: true,
         unique: true,
-        lowercase: true,
+        lowercase: true, 
         trim: true
     })
     productName: string;
