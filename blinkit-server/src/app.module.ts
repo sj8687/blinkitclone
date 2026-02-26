@@ -9,11 +9,13 @@ import { jwtConstants } from './auth/constants';
 import { JwtModule } from '@nestjs/jwt';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { CartModule } from './cart/cart.module';
 
 @Module({
     imports: [
         AuthModule,
         UserModule,
+        CartModule,
         ConfigModule.forRoot(),
         MongooseModule.forRoot(`${process.env.NODE_ENV == "development" ? "mongodb://localhost:27017/blinkit" : process.env.DATABASE_URL}`),
         JwtModule.register({
@@ -38,12 +40,11 @@ import { APP_GUARD } from '@nestjs/core';
                 limit: 100
             }
         ]),
+        CartModule,
     ],
 
     controllers: [AppController],
 
-
-    
     providers: [
         AppService,
         {
