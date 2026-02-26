@@ -26,10 +26,10 @@ class _BlinkitLoginPageState extends State<BlinkitLoginscreen> {
     debugPrint("Email:$email");
     debugPrint("Password:$password");
 
-    Navigator.push(
-    context,
-    MaterialPageRoute(builder:(context)=>BottomNavscreen()),
-    );
+    // Navigator.push(
+    // context,
+    // MaterialPageRoute(builder:(context)=>BottomNavscreen()),
+    // );
 
     final url = Uri.parse('http://localhost:3000/auth/signup');
 

@@ -1,7 +1,11 @@
+import 'dart:convert';
+
 import 'package:blinketclone/constants/appcolors.dart';
 import 'package:blinketclone/repository/widgets/uihelper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:http/http.dart' as http;
 
 class BlinkitHomescreen extends StatefulWidget {
   const BlinkitHomescreen({Key? key}) : super(key: key);
@@ -11,7 +15,43 @@ class BlinkitHomescreen extends StatefulWidget {
 }
 
 class _HomescreenState extends State<BlinkitHomescreen> {
+  final storage = FlutterSecureStorage();
+
   final TextEditingController searchController = TextEditingController();
+
+  List<Map<String, dynamic>> products = List.generate(20, (index) {
+    return {
+      "name": "Product ${index + 1}",
+      "price": (index + 1) * 10,
+      "image": "https://picsum.photos/200?random=$index",
+    };
+  });
+
+  Future<void> addToCart(Map<String, dynamic> item) async {
+    var token = await storage.read(key: 'jwt');
+    final url = Uri.parse("http://localhost:3000/add/cart");
+
+    print(item);
+
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({
+        "name": item["name"],
+        "price": item["price"],
+        "image": item["image"],
+      }),
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      print("Product added to cart successfully");
+    } else {
+      print("Failed to add to cart");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +94,7 @@ class _HomescreenState extends State<BlinkitHomescreen> {
 
                         UiHelper.CustomText(
                           text: "16 minutes",
-                          color:  Colors.white,
+                          color: Colors.white,
                           fontWeight: FontWeight.bold,
                           fontFamily: "extrabolditalic",
                           fontsize: 20.sp,
@@ -124,81 +164,88 @@ class _HomescreenState extends State<BlinkitHomescreen> {
           ),
 
           Expanded(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.w),
+            child: GridView.builder(
+              padding: EdgeInsets.all(12.w),
+              itemCount: products.length,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                crossAxisSpacing: 10.w,
+                mainAxisSpacing: 10.h,
+                childAspectRatio: 0.55,
+              ),
 
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(height: 20.h),
+              itemBuilder: (context, index) {
+                final item = products[index];
 
-                  Center(
-                    child: UiHelper.CustomImage(
-                      img: "shopping-cart.png",
-                      width: 150.w,
-                      height: 150.h,
-                    ),
-                  ),
+                print(item);
 
-                  SizedBox(height: 10.h),
-
-                  Center(
-                    child: UiHelper.CustomText(
-                      text: "Reordering will be easy",
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: "bold",
-                      fontsize: 18.sp,
-                    ),
-                  ),
-
-                  SizedBox(height: 5.h),
-
-                  Center(
-                    child: UiHelper.CustomText(
-                      text:
-                          "Items you order will show up here so you can buy them again easily.",
-                      color: Colors.grey,
-                      fontWeight: FontWeight.w400,
-                      fontsize: 12.sp,
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-
-                  SizedBox(height: 20.h),
-
-                  UiHelper.CustomText(
-                    text: "Bestsellers",
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
-                    fontsize: 18.sp,
-                  ),
-
-                  SizedBox(height: 10.h),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      UiHelper.productCard(
-                        image: "milk.png",
-                        name: "Fresh Milk",
-                        price: "27",
-                      ),
-
-                      UiHelper.productCard(
-                        image: "potato.png",
-                        name: "Potato",
-                        price: "37",
-                      ),
-
-                      UiHelper.productCard(
-                        image: "tomato.png",
-                        name: "Tomato",
-                        price: "37",
+                return Container(
+                  decoration: BoxDecoration(
+                    color: const Color.fromARGB(255, 235, 232, 232),
+                    borderRadius: BorderRadius.circular(12.r),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.shade200,
+                        blurRadius: 5,
+                        spreadRadius: 2,
                       ),
                     ],
                   ),
-                ],
-              ),
+                  padding: EdgeInsets.all(8.w),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(8.r),
+                        child: Image.network(
+                          item["image"],
+                          height: 60.h,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+
+                      SizedBox(height: 8.h),
+
+                      Text(
+                        item["name"],
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 13.sp,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+
+                      SizedBox(height: 4.h),
+
+                      Text(
+                        "₹${item["price"]}",
+                        style: TextStyle(
+                          fontSize: 12.sp,
+                          color: Colors.grey[700],
+                        ),
+                      ),
+
+                      SizedBox(height: 10.h),
+
+                      SizedBox(
+                        width: double.infinity,
+                        height: 30.h,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            addToCart(item);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            padding: EdgeInsets.zero,
+                          ),
+                          child: Text("ADD", style: TextStyle(fontSize: 12.sp)),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
             ),
           ),
         ],

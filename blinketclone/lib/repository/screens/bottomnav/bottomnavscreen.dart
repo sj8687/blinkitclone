@@ -15,7 +15,7 @@ class _BottomNavscreenState extends State<BottomNavscreen> {
   List<Widget> pages = [
     BlinkitHomescreen(),
     BlinkitCategoryscreen(),
-    Cartscreen(),
+    BlinkitCartscreen(),
     Printscreen(),
   ];
 
