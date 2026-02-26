@@ -17,7 +17,7 @@
 ## BASE URL 
   -- http://localhost:3000 
 
-## END POINTS 
+## Signup && signin END POINTS ------------------------------------------------------
 
 *  POST /auth/signup
 
@@ -75,3 +75,37 @@
           "Token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2OTllZDBmMGJmNDc3Y2FlODY2MTQwYjIiLCJlbWFpbCI6InRlc3Q1QGdtYWlsLmNvbSIsImlhdCI6MTc3MjAxNjA0MCwiZXhwIjoxNzcyMDE2MTAwfQ.KjQj7u5PUDad5ggtWfebyMA-KHCnc0ig0VUY5kvpxH4"
        }
 
+
+## cart -----------------------------------------------------------------------
+
+ * POST cart/add
+
+   --- PAYLOAD
+
+      {
+         "productName":"xyz2",
+         "imageUrl":"https://image.com",
+         "price":"12.00",
+         "qty":1
+      }
+
+   --- RESPONSE
+
+      {
+         "message": "cart added successfully...",
+         "statusCode": 201
+      }
+
+    * if already exist then
+
+      {
+         "message": "Product Already Exist...",
+         "statusCode": 409
+      }  
+
+   *  if unauthorized then 
+
+      {
+         "message": "Unauthorized",
+         "statusCode": 401
+      }   
