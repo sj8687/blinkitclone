@@ -17,7 +17,8 @@ export class CartSchemaModel {
         required: true,
         unique: true,
         lowercase: true, 
-        trim: true
+        trim: true,
+        index:true
     })
     productName: string;
 
@@ -33,7 +34,8 @@ export class CartSchemaModel {
     price: mongoose.Types.Decimal128;
 
     @Prop({
-        required: true
+        required: true,
+        default: 1
     })
     qty: number;
 }

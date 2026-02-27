@@ -1,4 +1,4 @@
-import { IsDecimal, IsNotEmpty, IsString, IsUrl, Min } from "class-validator";
+import { IsDecimal, IsInt, IsNotEmpty, IsOptional, IsString, IsUrl, Min } from "class-validator";
 
 export class AddCartDto {
 
@@ -15,7 +15,8 @@ export class AddCartDto {
     @IsDecimal({ decimal_digits: '2' })
     price: string;
 
-    @IsNotEmpty()
+    @IsOptional()
     @Min(1)
-    qty: number;
+    @IsInt()
+    qty?: number;
 }
