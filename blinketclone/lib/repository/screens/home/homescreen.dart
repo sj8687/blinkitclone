@@ -21,17 +21,18 @@ class _HomescreenState extends State<BlinkitHomescreen> {
 
   List<Map<String, dynamic>> products = List.generate(20, (index) {
     return {
-      "name": "Product ${index + 1}",
-      "price": (index + 1) * 10,
-      "image": "https://picsum.photos/200?random=$index",
+      "productName": "Product ${index + 1}",
+      "price": ((index + 1) * 10).toStringAsFixed(2),
+      "imageUrl": "https://picsum.photos/200?random=$index",
     };
   });
 
   Future<void> addToCart(Map<String, dynamic> item) async {
-    var token = await storage.read(key: 'jwt');
-    final url = Uri.parse("http://localhost:3000/add/cart");
+    final token = await storage.read(key: 'jwt');
+    final url = Uri.parse("http://localhost:3000/cart/add");
 
     print(item);
+    print(token);
 
     final response = await http.post(
       url,
@@ -40,9 +41,9 @@ class _HomescreenState extends State<BlinkitHomescreen> {
         'Authorization': 'Bearer $token',
       },
       body: jsonEncode({
-        "name": item["name"],
+        "productName": item["productName"],
         "price": item["price"],
-        "image": item["image"],
+        "imageUrl": item["imageUrl"],
       }),
     );
 
@@ -177,6 +178,11 @@ class _HomescreenState extends State<BlinkitHomescreen> {
               itemBuilder: (context, index) {
                 final item = products[index];
 
+                double price = double.parse(item["price"].toString());
+                String formattedPrice = price % 1 == 0
+                    ? price.toInt().toString()
+                    : price.toStringAsFixed(2);
+
                 print(item);
 
                 return Container(
@@ -198,7 +204,7 @@ class _HomescreenState extends State<BlinkitHomescreen> {
                       ClipRRect(
                         borderRadius: BorderRadius.circular(8.r),
                         child: Image.network(
-                          item["image"],
+                          item["imageUrl"],
                           height: 60.h,
                           width: double.infinity,
                           fit: BoxFit.cover,
@@ -208,7 +214,7 @@ class _HomescreenState extends State<BlinkitHomescreen> {
                       SizedBox(height: 8.h),
 
                       Text(
-                        item["name"],
+                        item["productName"],
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
@@ -220,7 +226,7 @@ class _HomescreenState extends State<BlinkitHomescreen> {
                       SizedBox(height: 4.h),
 
                       Text(
-                        "₹${item["price"]}",
+                       "₹$formattedPrice",
                         style: TextStyle(
                           fontSize: 12.sp,
                           color: Colors.grey[700],

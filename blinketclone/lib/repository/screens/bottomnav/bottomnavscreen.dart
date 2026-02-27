@@ -12,12 +12,21 @@ class BottomNavscreen extends StatefulWidget {
 
 class _BottomNavscreenState extends State<BottomNavscreen> {
   int currentindex = 0;
-  List<Widget> pages = [
-    BlinkitHomescreen(),
-    BlinkitCategoryscreen(),
-    BlinkitCartscreen(),
-    Printscreen(),
-  ];
+
+   final GlobalKey<BlinkitCartscreenState> cartScreenKey = GlobalKey<BlinkitCartscreenState>();
+
+  List<Widget> pages = [];
+
+  @override
+  void initState() {
+    super.initState();
+
+    pages = [
+      BlinkitHomescreen(),
+      BlinkitCategoryscreen(),
+      BlinkitCartscreen(key: cartScreenKey),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,6 +56,9 @@ class _BottomNavscreenState extends State<BottomNavscreen> {
         onTap: (index) {
           setState(() {
             currentindex = index;
+            if (index == 2) {
+              cartScreenKey.currentState?.fetchCart();
+            }
           });
         },
       ),
