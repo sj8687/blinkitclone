@@ -5,6 +5,7 @@ import { AuthGuard } from 'src/auth/Guards/auth.guard';
 import { CartService } from './cart.service';
 import { AddCartDto } from './DTO/add.cart.dto';
 import { CartSchemaModel } from './schema/add.cart.schema';
+import { updateCartDto } from './DTO/update.cart.qty';
 
 @Controller('cart')
 export class CartController {    
@@ -21,4 +22,10 @@ export class CartController {
     getCart(@Req() req:any){
         return this.CartService.getCart(req.user.userId);
     }
+
+    // @Post("/updateqty")
+    // @UseGuards(AuthGuard)
+    // updateCartQty(@Body() updateCartDto:updateCartDto ,@Req() req:any){
+    //     return this.CartService.updateQty(req.user.userId);
+    // }
 }
