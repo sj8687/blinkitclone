@@ -8,42 +8,42 @@ import { updateCartDto } from './DTO/update.cart.qty';
 @Injectable()
 export class CartService {
     constructor(@InjectModel(CartSchemaModel.name) private cartModel: Model<CartSchemaModel>) { }
-    async addCart(AddCartDto: AddCartDto,userId:string) {
+    async addCart(AddCartDto: AddCartDto, userId: string) {
         try {
-          const productAlreadyExist = await this.cartModel.findOne({
+            const productAlreadyExist = await this.cartModel.findOne({
                 productName: AddCartDto.productName,
-          });
-          if(productAlreadyExist){
-            return {
-                message:"Product Already Exist...",
-                statusCode:409
-            }
-          } else {
-             const product = await this.cartModel.create({
-                user:userId,
-                productName: AddCartDto.productName,
-                imageUrl: AddCartDto.imageUrl,
-                price: AddCartDto.price,
-                qty: AddCartDto.qty
             });
-            if(product) {
+            if (productAlreadyExist) {
                 return {
-                    message:"cart added successfully...",
-                    statusCode:201
+                    message: "Product Already Exist...",
+                    statusCode: 409
+                }
+            } else {
+                const product = await this.cartModel.create({
+                    user: userId,
+                    productName: AddCartDto.productName,
+                    imageUrl: AddCartDto.imageUrl,
+                    price: AddCartDto.price,
+                    qty: AddCartDto.qty
+                });
+                if (product) {
+                    return {
+                        message: "cart added successfully...",
+                        statusCode: 201
+                    }
                 }
             }
-          } 
         } catch (error) {
             console.log(error)
         }
     };
 
-    async getCart(userId:string){
+    async getCart(userId: string) {
         try {
             const myCarts = await this.cartModel.find({
-                user:userId,
+                user: userId,
             });
-            if(myCarts){
+            if (myCarts) {
                 return {
                     myCarts
                 }
@@ -52,12 +52,35 @@ export class CartService {
             console.log(error);
         }
     }
-    async updateQty(updateCartDto:updateCartDto,qty:number){
+    async updateQty(updateCartDto: updateCartDto, userId: string) {
         try {
-        //     const productAlreadyExist = await this.cartModel.findOne({
-        //         productName: updateCartDto.productName,
-        //         user:
-        //   });
+            const cartItem = await this.cartModel.findOne({
+                productName: updateCartDto.productName,
+                user: userId,
+            });
+            if (!cartItem) {
+                return { message: "product not found in your cart...", statusCode: 404 }
+            } else {
+                if (cartItem.qty === updateCartDto.qty) {
+                    return {
+                        message: "Quantity already same. No update needed.",
+                    };
+                } else {
+                    const updatedProduct = await this.cartModel.findOneAndUpdate(
+                        {
+                            productName: updateCartDto.productName,
+                            user: userId,
+                        },
+                        {
+                            $set: {
+                                qty: updateCartDto.qty,
+                            },
+                        },
+                        // { new: true } 
+                    );
+                    return {message : "your cart quantity updated...",statusCode:200}
+                }
+            }
         } catch (error) {
             console.log(error);
         }

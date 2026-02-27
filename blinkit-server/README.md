@@ -124,3 +124,26 @@
          "qty": 1
       }   
 
+* PATCH /cart/updateqty
+
+   --- PAYLOAD
+
+      {
+         "productName":"xyzxx",
+         "qty":2
+      }
+
+   --- RESPONSE   
+      {
+         "message": "your cart quantity updated...",
+         "statusCode": 200
+      }
+      if qty same and you update same qty again
+      {
+         "message": "Quantity already same. No update needed."
+      }
+      if product not fount
+      {
+         "message": "product not found in your cart...",
+         "statusCode": 404
+      }

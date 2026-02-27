@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post, Req, UseGuards } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { AuthGuard } from 'src/auth/Guards/auth.guard';
@@ -23,9 +23,9 @@ export class CartController {
         return this.CartService.getCart(req.user.userId);
     }
 
-    // @Post("/updateqty")
-    // @UseGuards(AuthGuard)
-    // updateCartQty(@Body() updateCartDto:updateCartDto ,@Req() req:any){
-    //     return this.CartService.updateQty(req.user.userId);
-    // }
+    @Patch("/updateqty")
+    @UseGuards(AuthGuard)
+    updateCartQty(@Body() updateCartDto:updateCartDto ,@Req() req:any){
+        return this.CartService.updateQty(updateCartDto,req.user.userId);
+    }
 }
