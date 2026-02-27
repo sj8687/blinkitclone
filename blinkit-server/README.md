@@ -86,7 +86,6 @@
          "productName":"xyz2",
          "imageUrl":"https://image.com",
          "price":"12.00",
-         "qty":1
       }
 
    --- RESPONSE
