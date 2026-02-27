@@ -147,3 +147,24 @@
          "message": "product not found in your cart...",
          "statusCode": 404
       }
+
+* DELETE cart/remove
+
+   --- PAYLOAD 
+
+      {
+         "productName":"xyz"
+      }
+
+   --- RESPONSE   
+
+      {
+         "message": "cart item not found...",
+         "statusCode": 404
+      }
+
+      if procuct not found
+      {
+         "message": "cart item not found...",
+         "statusCode": 404
+      }

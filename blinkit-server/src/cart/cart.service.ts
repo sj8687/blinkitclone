@@ -4,10 +4,12 @@ import { CartSchemaModel } from './schema/add.cart.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { updateCartDto } from './DTO/update.cart.qty';
+import { removeCartDto } from './DTO/remove.cart';
 
 @Injectable()
 export class CartService {
     constructor(@InjectModel(CartSchemaModel.name) private cartModel: Model<CartSchemaModel>) { }
+
     async addCart(AddCartDto: AddCartDto, userId: string) {
         try {
             const productAlreadyExist = await this.cartModel.findOne({
@@ -51,7 +53,7 @@ export class CartService {
         } catch (error) {
             console.log(error);
         }
-    }
+    };
     async updateQty(updateCartDto: updateCartDto, userId: string) {
         try {
             const cartItem = await this.cartModel.findOne({
@@ -78,11 +80,32 @@ export class CartService {
                         },
                         // { new: true } 
                     );
-                    return {message : "your cart quantity updated...",statusCode:200}
+                    return { message: "your cart quantity updated...", statusCode: 200 }
                 }
             }
         } catch (error) {
             console.log(error);
         }
+    };
+
+    async removeCart(removeCartDto: removeCartDto, userId: string) {
+        try {
+            const deleted = await this.cartModel.findOneAndDelete({
+                productName:removeCartDto.productName,
+                user: userId,
+            });
+
+            if (!deleted) {
+                return {message: "cart item not found...", statusCode:404};
+            }
+
+            return {
+                message: 'Cart item deleted successfully',
+                statusCode:200
+            };
+        } catch (error) {
+
+        }
     }
+
 }

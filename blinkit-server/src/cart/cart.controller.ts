@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Patch, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Patch, Post, Req, UseGuards } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { AuthGuard } from 'src/auth/Guards/auth.guard';
@@ -6,6 +6,7 @@ import { CartService } from './cart.service';
 import { AddCartDto } from './DTO/add.cart.dto';
 import { CartSchemaModel } from './schema/add.cart.schema';
 import { updateCartDto } from './DTO/update.cart.qty';
+import { removeCartDto } from './DTO/remove.cart';
 
 @Controller('cart')
 export class CartController {    
@@ -27,5 +28,10 @@ export class CartController {
     @UseGuards(AuthGuard)
     updateCartQty(@Body() updateCartDto:updateCartDto ,@Req() req:any){
         return this.CartService.updateQty(updateCartDto,req.user.userId);
+    }
+    @Delete("/remove")
+    @UseGuards(AuthGuard)
+    removeCartProduct(@Body() removeCartDto:removeCartDto ,@Req() req:any){
+        return this.CartService.removeCart(removeCartDto,req.user.userId);
     }
 }
