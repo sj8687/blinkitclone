@@ -109,7 +109,7 @@
          "statusCode": 401
       }   
 
-*GET /cart
+* GET /cart
 
    --- PAYLOAD
 
@@ -125,3 +125,5 @@
          },
          "qty": 1
       }   
+
+      
