@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:blinketclone/constants/appcolors.dart';
@@ -11,10 +12,11 @@ class BlinkitCartscreen extends StatefulWidget {
   const BlinkitCartscreen({Key? key}) : super(key: key);
 
   @override
-  State<BlinkitCartscreen> createState() => _CartscreenState();
+  BlinkitCartscreenState createState() => BlinkitCartscreenState();
+  
 }
 
-class _CartscreenState extends State<BlinkitCartscreen> {
+class BlinkitCartscreenState extends State<BlinkitCartscreen> {
   final TextEditingController searchController = TextEditingController();
 
   final storage = const FlutterSecureStorage();
@@ -25,8 +27,47 @@ class _CartscreenState extends State<BlinkitCartscreen> {
   @override
   void initState() {
     super.initState();
-    fetchCart();
+    // fetchCart();
   }
+
+Future<void> updateQuantityAPI(String cartId, int qty) async {
+  try {
+    final response = await http.patch(
+      Uri.parse("https://loclhost:3000/cart/update"),
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: jsonEncode({
+        "qty": qty,
+        "productName":cartId,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      print("Quantity updated successfully");
+    } else {
+      print("Failed to update quantity");
+    }
+  } catch (e) {
+    print("Error updating quantity: $e");
+  }
+}
+
+Timer? _debounce;
+
+void updateQuantity(Map item, int newQty) {
+  if (newQty < 1 || newQty > 10) return;
+
+  setState(() {
+    item["qty"] = newQty;
+  });
+
+  if (_debounce?.isActive ?? false) _debounce!.cancel();
+
+  _debounce = Timer(const Duration(milliseconds: 500), () {
+    updateQuantityAPI(item["_id"], newQty);
+  });
+}
 
   Future<void> fetchCart() async {
     var token = await storage.read(key: 'jwt');
@@ -42,11 +83,14 @@ class _CartscreenState extends State<BlinkitCartscreen> {
         },
       );
 
-      if (response.statusCode == 200) {
+      if (response.statusCode >= 200 && response.statusCode < 300) {
         final data = jsonDecode(response.body);
 
+        print("hiiii $data");
+        
+
         setState(() {
-          cartItems = data;
+          cartItems = data["myCarts"];
           isLoading = false;
         });
       } else {
@@ -173,26 +217,106 @@ class _CartscreenState extends State<BlinkitCartscreen> {
             ),
           ),
 
+
+
           Expanded(
-            child: isLoading
+            child: 
+               isLoading
                 ? Center(child: CircularProgressIndicator())
                 : cartItems.isEmpty
                 ? Center(child: Text("Cart is empty"))
-                : ListView.builder(
+                :
+          ListView.builder(
                     itemCount: cartItems.length,
                     itemBuilder: (context, index) {
                       final item = cartItems[index];
 
-                      return ListTile(
-                        leading: Image.network(
-                          item["image"],
-                          width: 50,
-                          height: 50,
-                          fit: BoxFit.cover,
-                        ),
-                        title: Text(item["name"]),
-                        subtitle: Text("₹${item["price"]}"),
-                      );
+                     return Container(
+  margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+  padding: const EdgeInsets.all(12),
+  decoration: BoxDecoration(
+    color: Colors.white,
+    borderRadius: BorderRadius.circular(12),
+    boxShadow: [
+      BoxShadow(
+        color: Colors.grey.shade200,
+        blurRadius: 6,
+        spreadRadius: 2,
+      )
+    ],
+  ),
+  child: Row(
+    children: [
+      // Product Image
+      ClipRRect(
+        borderRadius: BorderRadius.circular(10),
+        child: Image.network(
+          item["imageUrl"] ?? "",
+          width: 70,
+          height: 70,
+          fit: BoxFit.cover,
+        ),
+      ),
+
+      const SizedBox(width: 12),
+
+      // Product Details
+      Expanded(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              item["productName"] ?? "",
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              "₹${item["price"]}",
+              style: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ),
+
+      // Quantity Controls
+      Container(
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.green),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          children: [
+            IconButton(
+              onPressed: () {
+                // decrease qty logic
+              },
+              icon: const Icon(Icons.remove, size: 18),
+              color: Colors.green,
+            ),
+            Text(
+              item["qty"].toString(),
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            IconButton(
+  onPressed: () {
+    updateQuantity(item, item["qty"] + 1);
+  },
+  icon: const Icon(Icons.add),
+)
+          ],
+        ),
+      )
+    ],
+  ),
+);
                     },
                   ),
           ),
