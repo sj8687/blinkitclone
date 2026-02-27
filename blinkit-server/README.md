@@ -78,7 +78,7 @@
 
 ## cart -----------------------------------------------------------------------
 
- * POST cart/add
+* POST cart/add
 
    --- PAYLOAD
 
@@ -107,4 +107,21 @@
       {
          "message": "Unauthorized",
          "statusCode": 401
+      }   
+
+*GET /cart
+
+   --- PAYLOAD
+
+      Bearer Token
+
+   --- RESPONSE
+
+      {
+         "productName": "xyzz",
+         "imageUrl": "https://image.com",
+         "price": {
+            "$numberDecimal": "12.00"
+         },
+         "qty": 1
       }   

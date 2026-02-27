@@ -7,7 +7,7 @@ import { InjectModel } from '@nestjs/mongoose';
 @Injectable()
 export class CartService {
     constructor(@InjectModel(CartSchemaModel.name) private cartModel: Model<CartSchemaModel>) { }
-    async addCart(AddCartDto: AddCartDto,userId) {
+    async addCart(AddCartDto: AddCartDto,userId:string) {
         try {
           const productAlreadyExist = await this.cartModel.findOne({
                 productName: AddCartDto.productName,
@@ -36,4 +36,22 @@ export class CartService {
             console.log(error)
         }
     };
+
+    async getCart(userId:string){
+        try {
+            const myCarts = await this.cartModel.findOne({
+                user:userId,
+            });
+            if(myCarts){
+                return {
+                    productName:myCarts.productName,
+                    imageUrl:myCarts.imageUrl,
+                    price:myCarts.price,
+                    qty:myCarts.qty
+                }
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
 }
