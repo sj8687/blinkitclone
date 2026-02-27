@@ -13,7 +13,6 @@ class BlinkitCartscreen extends StatefulWidget {
 
   @override
   BlinkitCartscreenState createState() => BlinkitCartscreenState();
-  
 }
 
 class BlinkitCartscreenState extends State<BlinkitCartscreen> {
@@ -24,49 +23,39 @@ class BlinkitCartscreenState extends State<BlinkitCartscreen> {
   List<dynamic> cartItems = [];
   bool isLoading = true;
 
-  @override
-  void initState() {
-    super.initState();
-    // fetchCart();
-  }
 
-Future<void> updateQuantityAPI(String cartId, int qty) async {
-  try {
-    final response = await http.patch(
-      Uri.parse("https://loclhost:3000/cart/update"),
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: jsonEncode({
-        "qty": qty,
-        "productName":cartId,
-      }),
-    );
+  Future<void> updateQuantityAPI(String cartId, int qty) async {
+    try {
+         var token = await storage.read(key: 'jwt');
+      final response = await http.patch(
+        Uri.parse("http://localhost:3000/cart/updateqty"),
+       headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({"productName": cartId,"qty":qty}),
+      );
 
-    if (response.statusCode == 200) {
-      print("Quantity updated successfully");
-    } else {
-      print("Failed to update quantity");
+      if (response.statusCode == 200) {
+        print("Quantity updated successfully");
+      } else {
+        print("Failed to update quantity");
+      }
+    } catch (e) {
+      print("Error updating quantity: $e");
     }
-  } catch (e) {
-    print("Error updating quantity: $e");
   }
-}
 
-Timer? _debounce;
+  Timer? _debounce;
 
-void updateQuantity(Map item, int newQty) {
+  void updateQuantity(Map item, int newQty) {
   if (newQty < 1 || newQty > 10) return;
 
   setState(() {
     item["qty"] = newQty;
   });
 
-  if (_debounce?.isActive ?? false) _debounce!.cancel();
-
-  _debounce = Timer(const Duration(milliseconds: 500), () {
-    updateQuantityAPI(item["_id"], newQty);
-  });
+  updateQuantityAPI(item["productName"], newQty);
 }
 
   Future<void> fetchCart() async {
@@ -87,7 +76,6 @@ void updateQuantity(Map item, int newQty) {
         final data = jsonDecode(response.body);
 
         print("hiiii $data");
-        
 
         setState(() {
           cartItems = data["myCarts"];
@@ -217,106 +205,105 @@ void updateQuantity(Map item, int newQty) {
             ),
           ),
 
-
-
           Expanded(
-            child: 
-               isLoading
+            child: isLoading
                 ? Center(child: CircularProgressIndicator())
                 : cartItems.isEmpty
                 ? Center(child: Text("Cart is empty"))
-                :
-          ListView.builder(
+                : ListView.builder(
                     itemCount: cartItems.length,
                     itemBuilder: (context, index) {
                       final item = cartItems[index];
 
-                     return Container(
-  margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-  padding: const EdgeInsets.all(12),
-  decoration: BoxDecoration(
-    color: Colors.white,
-    borderRadius: BorderRadius.circular(12),
-    boxShadow: [
-      BoxShadow(
-        color: Colors.grey.shade200,
-        blurRadius: 6,
-        spreadRadius: 2,
-      )
-    ],
-  ),
-  child: Row(
-    children: [
-      // Product Image
-      ClipRRect(
-        borderRadius: BorderRadius.circular(10),
-        child: Image.network(
-          item["imageUrl"] ?? "",
-          width: 70,
-          height: 70,
-          fit: BoxFit.cover,
-        ),
-      ),
+                      return Container(
+                        margin: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.shade200,
+                              blurRadius: 6,
+                              spreadRadius: 2,
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            // Product Image
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: Image.network(
+                                item["imageUrl"] ?? "",
+                                width: 70,
+                                height: 70,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
 
-      const SizedBox(width: 12),
+                            const SizedBox(width: 12),
 
-      // Product Details
-      Expanded(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              item["productName"] ?? "",
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              "₹${item["price"]}",
-              style: const TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-      ),
+                            // Product Details
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    item["productName"] ?? "",
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    "₹${item["price"]}",
+                                    style: const TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
 
-      // Quantity Controls
-      Container(
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.green),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Row(
-          children: [
-            IconButton(
-              onPressed: () {
-                // decrease qty logic
-              },
-              icon: const Icon(Icons.remove, size: 18),
-              color: Colors.green,
-            ),
-            Text(
-              item["qty"].toString(),
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            IconButton(
-  onPressed: () {
-    updateQuantity(item, item["qty"] + 1);
-  },
-  icon: const Icon(Icons.add),
-)
-          ],
-        ),
-      )
-    ],
-  ),
-);
+                            // Quantity Controls
+                            Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.green),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Row(
+                                children: [
+                                  IconButton(
+                                    onPressed: () {
+                                      // decrease qty logic
+                                    },
+                                    icon: const Icon(Icons.remove, size: 18),
+                                    color: Colors.green,
+                                  ),
+                                  Text(
+                                    item["qty"].toString(),
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  IconButton(
+                                    onPressed: () {
+                                      updateQuantity(item , item["qty"] + 1);
+                                    },
+                                    icon: const Icon(Icons.add),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
                     },
                   ),
           ),
