@@ -85,7 +85,7 @@
       {
          "productName":"xyz2",
          "imageUrl":"https://image.com",
-         "price":"12.00",
+         "price":"12.00", 
       }
 
    --- RESPONSE
@@ -120,10 +120,7 @@
       {
          "productName": "xyzz",
          "imageUrl": "https://image.com",
-         "price": {
-            "$numberDecimal": "12.00"
-         },
+         "price": 100
          "qty": 1
       }   
 
-      

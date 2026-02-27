@@ -29,9 +29,9 @@ export class CartSchemaModel {
 
     @Prop({
         required: true,
-        type: mongoose.Schema.Types.Decimal128,
+        type: mongoose.Schema.Types.Double,
     })
-    price: mongoose.Types.Decimal128;
+    price: mongoose.Types.Double;
 
     @Prop({
         required: true,
