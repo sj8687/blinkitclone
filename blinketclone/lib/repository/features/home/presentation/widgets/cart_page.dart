@@ -9,25 +9,25 @@ class CategoryList extends StatelessWidget {
     final categories = ["Fruits", "Dairy", "Snacks", "Beverages", "Bakery"];
 
     return SizedBox(
-      height: 80.h, // reduced height to prevent overflow
+      height: 80.h, 
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         padding: EdgeInsets.symmetric(horizontal: 12.w),
         itemCount: categories.length,
         itemBuilder: (_, index) {
           return Container(
-            width: 70.w, // slightly smaller to fit text
+            width: 70.w, 
             margin: EdgeInsets.only(right: 12.w),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center, // centers content vertically
+              mainAxisAlignment: MainAxisAlignment.center, 
               children: [
                 CircleAvatar(
                   radius: 25.r, // smaller radius
                   backgroundColor: Colors.yellow[100],
                 ),
-                SizedBox(height: 4.h), // smaller spacing
+                SizedBox(height: 4.h),
                 FittedBox(
-                  fit: BoxFit.scaleDown, // ensures text fits
+                  fit: BoxFit.scaleDown, 
                   child: Text(
                     categories[index],
                     style: TextStyle(
