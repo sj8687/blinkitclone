@@ -23,17 +23,16 @@ class BlinkitCartscreenState extends State<BlinkitCartscreen> {
   List<dynamic> cartItems = [];
   bool isLoading = true;
 
-
   Future<void> updateQuantityAPI(String cartId, int qty) async {
     try {
-         var token = await storage.read(key: 'jwt');
+      var token = await storage.read(key: 'jwt');
       final response = await http.patch(
         Uri.parse("http://localhost:3000/cart/updateqty"),
-       headers: {
+        headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
         },
-        body: jsonEncode({"productName": cartId,"qty":qty}),
+        body: jsonEncode({"productName": cartId, "qty": qty}),
       );
 
       if (response.statusCode == 200) {
@@ -49,14 +48,14 @@ class BlinkitCartscreenState extends State<BlinkitCartscreen> {
   Timer? _debounce;
 
   void updateQuantity(Map item, int newQty) {
-  if (newQty < 1 || newQty > 10) return;
+    if (newQty < 1 || newQty > 10) return;
 
-  setState(() {
-    item["qty"] = newQty;
-  });
+    setState(() {
+      item["qty"] = newQty;
+    });
 
-  updateQuantityAPI(item["productName"], newQty);
-}
+    updateQuantityAPI(item["productName"], newQty);
+  }
 
   Future<void> fetchCart() async {
     var token = await storage.read(key: 'jwt');
@@ -281,7 +280,7 @@ class BlinkitCartscreenState extends State<BlinkitCartscreen> {
                                 children: [
                                   IconButton(
                                     onPressed: () {
-                                      // decrease qty logic
+                                      updateQuantity(item, item["qty"] - 1);
                                     },
                                     icon: const Icon(Icons.remove, size: 18),
                                     color: Colors.green,
@@ -294,7 +293,7 @@ class BlinkitCartscreenState extends State<BlinkitCartscreen> {
                                   ),
                                   IconButton(
                                     onPressed: () {
-                                      updateQuantity(item , item["qty"] + 1);
+                                      updateQuantity(item, item["qty"] + 1);
                                     },
                                     icon: const Icon(Icons.add),
                                   ),

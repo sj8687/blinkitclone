@@ -5,7 +5,7 @@ class ApiService {
   final FlutterSecureStorage storage = const FlutterSecureStorage();
   final Dio _dio = Dio(
     BaseOptions(
-      baseUrl: "http://10.0.2.2:3000",
+      baseUrl: "http://localhost:3000",
       headers: {
         "Content-Type": "application/json",
       },

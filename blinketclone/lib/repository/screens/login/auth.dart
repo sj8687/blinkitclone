@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:blinketclone/constants/appcolors.dart';
 import 'package:blinketclone/model/model.dart';
+import 'package:blinketclone/repository/screens/animatedpages/loginanimationsuccess.dart';
 import 'package:blinketclone/repository/screens/bottomnav/bottomnavscreen.dart';
 import 'package:blinketclone/repository/screens/home/homescreen.dart';
 import 'package:blinketclone/repository/widgets/uihelper.dart';
@@ -59,8 +60,15 @@ class _BlinkitLoginPageState extends State<BlinkitLoginscreen> {
 
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => BottomNavscreen()),
+          MaterialPageRoute(builder: (_) =>  LoginSuccessAniScreen()),
         );
+
+
+        // Navigator.push(
+        //   context,
+        //   MaterialPageRoute(builder: (context) => BottomNavscreen()),
+        // );
+
       } else {
         final error = jsonDecode(response.body);
         print("Login Failed:${error['message']}");

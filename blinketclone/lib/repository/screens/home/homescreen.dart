@@ -19,7 +19,7 @@ class _HomescreenState extends State<BlinkitHomescreen> {
 
   final TextEditingController searchController = TextEditingController();
 
-  List<Map<String, dynamic>> products = List.generate(20, (index) {
+  List<Map<String, dynamic>> products = List.generate(40, (index) {
     return {
       "productName": "Product ${index + 1}",
       "price": ((index + 1) * 10).toStringAsFixed(2),
